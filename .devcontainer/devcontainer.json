@@ -1,0 +1,11 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+    "name": "APS-Playground", // container name
+    "image": "python:3.10-slim", // container image
+    "postCreateCommand": "pip3 install --user -r ./requirements.txt", // install all libraries from requirements.txt
+    "runArgs": [ // use .env file, with aps-id and aps-client
+        "--env-file",
+        ".devcontainer/devcontainer.env"
+    ]
+}
