@@ -5,9 +5,8 @@ const options = {
         fetch('/auth/2leggedtoken/').then(resp => {
             if (resp.ok) {
                 resp.json().then(data => {
-                    // console.log(data);
-                    const { accessToken, expire } = data;
-                    onSuccess(accessToken, expire);
+                    const accessToken = data['access_token'];
+                    onSuccess(accessToken);
                 })
             }
             else {
@@ -35,7 +34,7 @@ let initViewer = new Promise(function (resolve, reject) {
 })
 
 initViewer.then(viewer => {
-    // console.log(viewer);
+    //console.log(viewer);
     // Load model
     const documentId = 'urn:' + 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2FtcGxlLXByb2plY3RzL0RBQ0hfc2FtcGxlX3Byb2plY3QucnZ0'
     Autodesk.Viewing.Document.load(

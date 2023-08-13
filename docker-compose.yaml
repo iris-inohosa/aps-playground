@@ -1,0 +1,12 @@
+services:
+  app:
+    build: app
+    container_name: aps-playground
+    env_file: app/docker.env
+    restart: always
+    # override dockerfile command and run gunicorn on host machine port 5000
+    command: gunicorn --bind :8000 --reload wsgi:app
+    volumes: [ .:/app/app ]
+    expose:
+      - "8000"
+    ports: [ "8000:8000" ]

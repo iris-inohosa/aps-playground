@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_APP_KEY']
 
-CORS(app, origins=['http://localhost:8000', 'http://127.0.0.1:8000'])
+CORS(app, origins=['http://localhost:8000', 'http://127.0.0.1:8000', 'onrender.com'])
 
 # Get environment variables
 APS_APP_ID = os.environ['APS_APP_ID']
@@ -49,6 +49,17 @@ def get_bucket_content(bucket_name):
     models = [{ 'model_title': model['objectKey'], 'model_urn': get_encoded_urn(model['objectId']), 'models_size': get_model_size(model['size']) } for model in data['items']]
 
     return models
+
+@app.route('/manifest/<urn>/')
+def get_model_manifest(urn):
+    token = get_2legged_token('viewables:read')['access_token']
+    
+    headers = { "Authorization" : "Bearer " + token }
+    endpoint = f"https://developer.api.autodesk.com/modelderivative/v2/regions/eu/designdata/{urn}/manifest"
+    res = requests.get(endpoint, headers=headers)
+    data = res.json()
+
+    return data
 
 
 # get token, depending on scope
