@@ -1,24 +1,58 @@
-var viewer;
-var options = {
-    env: 'AutodeskProduction2',
-    api: 'streamingV2',  // for models uploaded to EMEA change this option to 'streamingV2_EU'
-    getAccessToken: function (onTokenReady) {
-        var token = 'YOUR_ACCESS_TOKEN';
-        var timeInSeconds = 3600; // Use value provided by APS Authentication (OAuth) API
-        onTokenReady(token, timeInSeconds);
+const options = {
+    env: "AutodeskProduction",
+    language: "de",
+    getAccessToken: function (onSuccess) {
+        fetch('/auth/2leggedtoken/').then(resp => {
+            if (resp.ok) {
+                resp.json().then(data => {
+                    // console.log(data);
+                    const { accessToken, expire } = data;
+                    onSuccess(accessToken, expire);
+                })
+            }
+            else {
+                throw new Error(resp.text());
+            }
+        })
+
     }
 };
 
-Autodesk.Viewing.Initializer(options, function () {
+// callback function, than will be called after initialization in finished
+let initViewer = new Promise(function (resolve, reject) {
+    Autodesk.Viewing.Initializer(options, function () {
+        const container = document.getElementById('model-viewer');
+        const viewer = new Autodesk.Viewing.GuiViewer3D(container);
+        const viewerCode = viewer.start();
 
-    var htmlDiv = document.getElementById('app');
-    viewer = new Autodesk.Viewing.GuiViewer3D(htmlDiv);
-    var startedCode = viewer.start();
-    if (startedCode > 0) {
-        console.error('Failed to create a Viewer: WebGL not supported.');
-        return;
-    }
+        if (viewerCode != 0) {
+            reject(viewerCode)
+        }
+        else {
+            resolve(viewer);
+        }
+    });
+})
 
-    console.log('Initialization complete, loading a model next...');
+initViewer.then(viewer => {
+    // console.log(viewer);
+    // Load model
+    const documentId = 'urn:' + 'dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6c2FtcGxlLXByb2plY3RzL0RBQ0hfc2FtcGxlX3Byb2plY3QucnZ0'
+    Autodesk.Viewing.Document.load(
+        documentId,
+        function onModelLoadSucceed(doc) {
+            viewer.loadDocumentNode(doc, doc.getRoot().getDefaultGeometry());
+        },
+        function onModelLoadFailed(errCode, errMsg) {
+            console.error('Failed to load manifest [' + errCode + '] ' + errMsg);
+        }
+    )
 
-});
+}).catch(reject => {
+
+    console.error('Initalization failed:', reject);
+})
+
+
+
+
