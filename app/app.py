@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 app.secret_key = os.environ['FLASK_APP_KEY']
 
-CORS(app, origins=['http://localhost:8000', 'http://127.0.0.1:8000', 'onrender.com'])
+CORS(app, origins=['http://localhost:8000', 'http://127.0.0.1:8000', 'https://aps-playground.onrender.com'])
 
 # Get environment variables
 APS_APP_ID = os.environ['APS_APP_ID']
